@@ -45,8 +45,7 @@ class SimpleURLs {
 				'query_var'     => true,
 				'menu_position' => 20,
 				'supports'      => array( 'title' ),
-				'rewrite'       => array( 'slug' => 'go', 'with_front' => false )
-
+				'rewrite'       => array( 'slug' => apply_filters( 'simple_urls_slug', 'go' ), 'with_front' => false ),
 			)
 		);
 		
