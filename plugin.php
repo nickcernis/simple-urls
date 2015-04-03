@@ -148,6 +148,16 @@ class SimpleURLs {
 		// Handle the redirect
 		$redirect = isset( $wp_query->post->ID ) ? get_post_meta( $wp_query->post->ID, '_surl_redirect', true ) : '';
 
+		/**
+		 * Action hook that fires before the redirect.
+		 *
+		 * @since 0.9.5
+		 *
+		 * @param string  $redirect The URL to redirect to.
+		 * @param int  $var The current click count.
+		 */
+		do_action( 'simple_urls_redirect', $redirect, $count );
+
 		if ( ! empty( $redirect ) ) {
 			wp_redirect( esc_url_raw( $redirect ), 301);
 			exit;
