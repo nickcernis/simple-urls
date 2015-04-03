@@ -149,6 +149,16 @@ class SimpleURLs {
 		$redirect = isset( $wp_query->post->ID ) ? get_post_meta( $wp_query->post->ID, '_surl_redirect', true ) : '';
 
 		/**
+		 * Filter the redirect URL.
+		 *
+		 * @since 0.9.5
+		 *
+		 * @param string  $redirect The URL to redirect to.
+		 * @param int  $var The current click count.
+		 */
+		$redirect = apply_filters( 'simple_urls_redirect_url', $redirect, $count );
+
+		/**
 		 * Action hook that fires before the redirect.
 		 *
 		 * @since 0.9.5
