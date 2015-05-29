@@ -14,38 +14,63 @@ class SimpleURLs {
 
 		//register_activation_hook( __FILE__, 'flush_rewrite_rules' );
 
-		add_action( 'init', array( &$this, 'register_post_type' ) );
-		add_action( 'manage_posts_custom_column', array( &$this, 'columns_data' ) );
-		add_filter( 'manage_edit-surl_columns', array( &$this, 'columns_filter' ) );
-		add_action( 'admin_menu', array( &$this, 'add_meta_box' ) );
-		add_action( 'save_post', array( &$this, 'meta_box_save' ), 1, 2 );
-		add_action( 'template_redirect', array( &$this, 'count_and_redirect' ) );
+		add_action( 'init', array( $this, 'register_post_type' ) );
+		add_action( 'manage_posts_custom_column', array( $this, 'columns_data' ) );
+		add_filter( 'manage_edit-surl_columns', array( $this, 'columns_filter' ) );
+
+		add_filter( 'post_updated_messages', array( $this, 'updated_message' ) );
+
+		add_action( 'admin_menu', array( $this, 'add_meta_box' ) );
+		add_action( 'save_post', array( $this, 'meta_box_save' ), 1, 2 );
+		add_action( 'template_redirect', array( $this, 'count_and_redirect' ) );
 
 	}
 	
 	function register_post_type() {
-		
-		register_post_type( 'surl',
+
+		$slug = 'surl';
+
+		$labels = array(
+			'name'               => __( 'Simple URLs', 'simple-urls' ),
+			'singular_name'      => __( 'URL', 'simple-urls' ),
+			'add_new'            => __( 'Add New', 'simple-urls' ),
+			'add_new_item'       => __( 'Add New URL', 'simple-urls' ),
+			'edit'               => __( 'Edit', 'simple-urls' ),
+			'edit_item'          => __( 'Edit URL', 'simple-urls' ),
+			'new_item'           => __( 'New URL', 'simple-urls' ),
+			'view'               => __( 'View URL', 'simple-urls' ),
+			'view_item'          => __( 'View URL', 'simple-urls' ),
+			'search_items'       => __( 'Search URL', 'simple-urls' ),
+			'not_found'          => __( 'No URLs found', 'simple-urls' ),
+			'not_found_in_trash' => __( 'No URLs found in Trash', 'simple-urls' ),
+			'messages'           => array(
+				 0 => '', // Unused. Messages start at index 1.
+				 1 => __( 'URL updated. <a href="%s">View URL</a>', 'simple-urls' ),
+				 2 => __( 'Custom field updated.', 'simple-urls' ),
+				 3 => __( 'Custom field deleted.', 'simple-urls' ),
+				 4 => __( 'URL updated.', 'simple-urls' ),
+				/* translators: %s: date and time of the revision */
+				 5 => isset( $_GET['revision'] ) ? sprintf( __( 'Post restored to revision from %s', 'simple-urls' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
+				 6 => __( 'URL updated. <a href="%s">View URL</a>', 'simple-urls' ),
+				 7 => __( 'URL saved.', 'simple-urls' ),
+				 8 => __( 'URL submitted.', 'simple-urls' ),
+				 9 => __( 'URL scheduled', 'simple-urls' ),
+				10 => __( 'URL draft updated.', 'simple-urls' ),
+			),
+		);
+
+		$labels = apply_filters( 'simple_urls_cpt_labels', $labels );
+
+		$rewrite_slug = apply_filters( 'simple_urls_slug', 'go' );
+
+		register_post_type( $slug,
 			array(
-				'labels' => array(
-					'name'               => __( 'Simple URLs' ),
-					'singular_name'      => __( 'URL' ),
-					'add_new'            => __( 'Add New' ),
-					'add_new_item'       => __( 'Add New URL' ),
-					'edit'               => __( 'Edit' ),
-					'edit_item'          => __( 'Edit URL' ),
-					'new_item'           => __( 'New URL' ),
-					'view'               => __( 'View URL' ),
-					'view_item'          => __( 'View URL' ),
-					'search_items'       => __( 'Search URL' ),
-					'not_found'          => __( 'No URLs found' ),
-					'not_found_in_trash' => __( 'No URLs found in Trash' )
-				),
+				'labels'        => $labels,
 				'public'        => true,
 				'query_var'     => true,
 				'menu_position' => 20,
 				'supports'      => array( 'title' ),
-				'rewrite'       => array( 'slug' => apply_filters( 'simple_urls_slug', 'go' ), 'with_front' => false ),
+				'rewrite'       => array( 'slug' => $rewrite_slug, 'with_front' => false ),
 			)
 		);
 		
@@ -55,10 +80,10 @@ class SimpleURLs {
 		
 		$columns = array(
 			'cb'        => '<input type="checkbox" />',
-			'title'     => __( 'Title' ),
-			'url'       => __( 'Redirect to' ),
-			'permalink' => __( 'Permalink' ),
-			'clicks'    => __( 'Clicks' ),
+			'title'     => __( 'Title', 'simple-urls' ),
+			'url'       => __( 'Redirect to', 'simple-urls' ),
+			'permalink' => __( 'Permalink', 'simple-urls' ),
+			'clicks'    => __( 'Clicks', 'simple-urls' ),
 		);
 		
 		return $columns;
@@ -83,9 +108,24 @@ class SimpleURLs {
 		}
 		
 	}
+
+	function updated_message( $messages ) {
+
+		$surl_object = get_post_type_object( 'surl' );
+		$messages['surl'] = $surl_object->labels->messages;
+
+		if ( $permalink = get_permalink() ) {
+			foreach ( $messages['surl'] as $id => $message ) {
+				$messages['surl'][ $id ] = sprintf( $message, $permalink );
+			}
+		}
+
+		return $messages;
+
+	}
 	
 	function add_meta_box() {
-		add_meta_box( 'surl', __( 'URL Information', 'surl' ), array( $this, 'meta_box' ), 'surl', 'normal', 'high' );
+		add_meta_box( 'surl', __( 'URL Information', 'simple-urls' ), array( $this, 'meta_box' ), 'surl', 'normal', 'high' );
 	}
 	
 	function meta_box() {
@@ -94,11 +134,12 @@ class SimpleURLs {
 
 		printf( '<input type="hidden" name="_surl_nonce" value="%s" />', wp_create_nonce( plugin_basename(__FILE__) ) );
 
-		printf( '<p><label for="%s">%s</label></p>', '_surl_redirect', __( 'Redirect URI', 'surl' ) );
+		printf( '<p><label for="%s">%s</label></p>', '_surl_redirect', __( 'Redirect URI', 'simple-urls' ) );
 		printf( '<p><input style="%s" type="text" name="%s" id="%s" value="%s" /></p>', 'width: 99%;', '_surl_redirect', '_surl_redirect', esc_attr( get_post_meta( $post->ID, '_surl_redirect', true ) ) );
+		printf( '<p><span class="description">%s</span></p>', __( 'This is the URL that the Redirect Link you create on this page will redirect to when accessed in a web browser.', 'simple-urls' ) );
 
 		$count = isset( $post->ID ) ? get_post_meta($post->ID, '_surl_count', true) : 0;
-		printf( '<p>This URL has been accessed <b>%d</b> times.', esc_attr( $count ) );
+		echo '<p>' . sprintf( __( 'This URL has been accessed %d times', 'simple-urls' ), esc_attr( $count ) ) . '</p>';
 		
 	}
 	
