@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: redirect, click tracking, custom post types
 Requires at least: 3.0
 Tested up to: 3.5
-Stable tag: 0.9.5
+Stable tag: 0.9.6
 
 Simple URLs is a complete URL management system that allows you create, manage, and track outbound links from your site.
 
@@ -44,6 +44,10 @@ No, not without modifying the plugin.
 2. The URL create/edit screen
 
 == Changelog ==
+
+= 0.9.6 =
+* Add plugin header i18n
+* Add textdomain loader
 
 = 0.9.5 =
 * Changed messages and labels.
