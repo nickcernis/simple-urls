@@ -83,10 +83,8 @@ class SimpleURLs {
 		
 		$rewrite_slug = sanitize_title( $rewrite_slug, $rewrite_slug_default );
 		
-		// Ref: https://developer.wordpress.org/reference/functions/add_post_type_support/
 		$supports_array = apply_filters( 'simple_urls_post_type_supports', array( 'title' ) );
     
-    // Ref: https://developer.wordpress.org/reference/functions/register_post_type/
 		register_post_type( $slug,
 			array(
 				'labels'              => $labels,
