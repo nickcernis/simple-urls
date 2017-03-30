@@ -88,7 +88,7 @@ class SimpleURLs {
 		register_post_type( $slug,
 			array(
 				'labels'              => $labels,
-				'public'              => false,
+				'public'              => true,
 				'exclude_from_search' => apply_filters( 'simple_urls_exclude_from_search', true ),
 				'show_ui'             => true,
 				'query_var'           => true,
