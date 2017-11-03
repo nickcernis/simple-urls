@@ -8,7 +8,7 @@ Description: Simple URLs is a complete URL management system that allows you cre
 Author: Nathan Rice
 Author URI: http://www.nathanrice.net/
 
-Version: 0.9.6
+Version: 0.9.7
 
 Text Domain: simple-urls
 Domain Path: /languages
