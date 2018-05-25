@@ -199,7 +199,7 @@ class SimpleURLs {
 		global $wp_query;
 
 		// Update the count
-		$count = isset( $wp_query->post->ID ) ? get_post_meta( $wp_query->post->ID, '_surl_count', true ) : 0;
+		$count = isset( $wp_query->post->_surl_count ) ? $wp_query->post->_surl_count : 0;
 		update_post_meta( $wp_query->post->ID, '_surl_count', $count + 1 );
 
 		// Handle the redirect
